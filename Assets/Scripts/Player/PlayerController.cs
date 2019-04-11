@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask digLayer;
     [SerializeField] private float selectDistance;
     [SerializeField] private Animator toolAnimator;
+    
     private Animator animator;
     private float currentSpeed;
     private float rotationX = 0;

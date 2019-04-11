@@ -5,7 +5,9 @@ using UnityEngine;
 public class ObjectSpawning : MonoBehaviour
 {
     [SerializeField] private GameObject torchObject, chestObject, portalObject, objectHolder;
-    private Vector2 firstCellPos, secondCellPos;
+    [Range(0,100)]
+    [SerializeField] float torchRarety = 97.0f;
+    private Vector2 portalSpawnCellPos;
 
     public void Start() {
         
@@ -14,7 +16,7 @@ public class ObjectSpawning : MonoBehaviour
         for(int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
                 if (map[x, z].isNearWall) {
-                    if(Random.Range(0.0f,101.0f) > 98.0f && map[x,z].canPutTorch) {
+                    if(Random.Range(0.0f,100.0f) > torchRarety && map[x,z].canPutTorch) {
                         GameObject torch = Instantiate(torchObject, new Vector3(map[x, z].position.x, 5, map[x, z].position.y), Quaternion.identity);
                         torch.name = "Torch";
                         Vector3 targetRot = new Vector3(map[x, z].wallPosition.x, 5, map[x, z].wallPosition.y);
@@ -32,14 +34,14 @@ public class ObjectSpawning : MonoBehaviour
         CellularAutomata.Cell firstCell = new CellularAutomata.Cell();
         firstCell.isNearWall = true;
         firstCell.isBorder = false;
-        while (firstCell.isNearWall || firstCell.isBorder || !firstCell.isAlive) {
+        while (firstCell.isNearWall || firstCell.isBorder || !firstCell.isAlive || firstCell.position == portalSpawnCellPos) {
             firstCell = map[Random.Range(0, size), Random.Range(0, size)];
         }
 
         CellularAutomata.Cell secondCell = new CellularAutomata.Cell();
         secondCell.isNearWall = true;
         secondCell.isBorder = false;
-        while (secondCell.isNearWall || secondCell.isBorder || !secondCell.isAlive || secondCell.position == firstCell.position) {
+        while (secondCell.isNearWall || secondCell.isBorder || !secondCell.isAlive || secondCell.position == firstCell.position || secondCell.position == portalSpawnCellPos) {
             secondCell = map[Random.Range(0, size), Random.Range(0, size)];
         }
 
@@ -48,12 +50,9 @@ public class ObjectSpawning : MonoBehaviour
 
         GameObject SecondChest = Instantiate(chestObject, new Vector3(secondCell.position.x, 2, secondCell.position.y), Quaternion.identity);
         SecondChest.GetComponent<ChestProperty>().ItemType = InventorySystem.itemType.pickaxe;
-
-        firstCellPos = firstCell.position;
-        secondCellPos = secondCell.position;
     }
 
-    public void SpawnPortal(List<CellularAutomata.Room> rooms, CellularAutomata.Cell[,] map) {
+    public void SpawnPortal(List<CellularAutomata.Room> rooms, CellularAutomata.Cell[,] map, int size) {
         CellularAutomata.Cell spawnCell = new CellularAutomata.Cell();
         spawnCell.isNearWall = true;
         spawnCell.isBorder = false;
@@ -64,18 +63,14 @@ public class ObjectSpawning : MonoBehaviour
         //spawnRoom = rooms[Random.Range(0, rooms.Count)];
         
         
-        while(spawnCell.isNearWall 
-            || spawnCell.isBorder 
-            || spawnCell.position == firstCellPos 
-            || spawnCell.position == secondCellPos 
-            || Vector2.Distance(spawnCell.position, firstCellPos) < 2 
-            || Vector2.Distance(spawnCell.position, secondCellPos) < 2)
-            {
+        while(spawnCell.isNearWall || spawnCell.isBorder)
+        {
             spawnCell = map[Random.Range(10, 40), Random.Range(10, 40)];
         }
 
         Instantiate(portalObject, new Vector3(spawnCell.position.x, 2, spawnCell.position.y), Quaternion.identity);
         cleanPortalCells(spawnCell,map);
+        portalSpawnCellPos = spawnCell.position;
     }
 
     void cleanPortalCells(CellularAutomata.Cell cell, CellularAutomata.Cell[,] map) {
@@ -96,7 +91,6 @@ public class ObjectSpawning : MonoBehaviour
         }
         Debug.Log(cellsToClean.Count);
 
-        GetComponent<CellularAutomata>().ClearPath(cellsToClean);
-        
+        GetComponent<CellularAutomata>().ClearPath(cellsToClean, true);
     }
 }

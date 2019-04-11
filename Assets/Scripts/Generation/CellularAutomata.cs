@@ -261,11 +261,10 @@ public class CellularAutomata : MonoBehaviour {
             }
         }
 
-        //Spawn torches
-        GetComponent<ObjectSpawning>().SpawnTorches(cells, size);
 
         //Spawn portal
-        GetComponent<ObjectSpawning>().SpawnPortal(rooms, cells);
+        GetComponent<ObjectSpawning>().SpawnPortal(rooms, cells, size);
+
 
         //Generate tilemap
         isRunning = false;
@@ -493,7 +492,7 @@ public class CellularAutomata : MonoBehaviour {
     }
 
     //Clean path
-    public void ClearPath(List<Cell> path) {
+    public void ClearPath(List<Cell> path, bool triggerTorchSpawning = false) {
         foreach (Cell c in path) {
             if (!c.isAlive) {
                 cells[c.position.x, c.position.y].isAlive = true;
@@ -501,9 +500,27 @@ public class CellularAutomata : MonoBehaviour {
                 foreach (Cell nc in neighbors) {
                     if (!nc.isAlive) {
                         cells[nc.position.x, nc.position.y].isAlive = true;
+
+                        cells[nc.position.x + 1, nc.position.y].canPutTorch = false;
+                        cells[nc.position.x - 1, nc.position.y].canPutTorch = false;
+                        cells[nc.position.x, nc.position.y + 1].canPutTorch = false;
+                        cells[nc.position.x, nc.position.y - 1].canPutTorch = false;
+
+                        cells[nc.position.x + 1, nc.position.y - 1].canPutTorch = false;
+                        cells[nc.position.x - 1, nc.position.y - 1].canPutTorch = false;
+                        cells[nc.position.x + 1, nc.position.y + 1].canPutTorch = false;
+                        cells[nc.position.x - 1, nc.position.y - 1].canPutTorch = false;
+
+
+
+
                     }
                 }
             }
+        }
+
+        if (triggerTorchSpawning) {
+            GetComponent<ObjectSpawning>().SpawnTorches(cells, size);
         }
     }
 
