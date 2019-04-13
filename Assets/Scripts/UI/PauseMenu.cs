@@ -46,10 +46,12 @@ public class PauseMenu : MonoBehaviour
 
     public void Restart() {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        LevelCounter.instance.ResetCounter();
     }
 
     public void Menu() {
         SceneManager.LoadScene("MainMenu");
+        LevelCounter.instance.DestroyCounter();
     }
 
     public void Continue() {

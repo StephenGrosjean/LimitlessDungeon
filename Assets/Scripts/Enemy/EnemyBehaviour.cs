@@ -7,8 +7,10 @@ public class EnemyBehaviour : MonoBehaviour
     public states currentState = states.followPath;
     public enum states { followPath, followPlayer };
     private states lastState;
+    [SerializeField] private LayerMask playerMask;
     [SerializeField] private Animator animator;
     [SerializeField] private float nearDistance;
+    [SerializeField] private float hitDistance;
     [SerializeField] private float speed;
     private NavMeshGeneration.Node currentNode;
     public NavMeshGeneration.Node CurrentNode { get { return currentNode; } }
@@ -18,8 +20,10 @@ public class EnemyBehaviour : MonoBehaviour
     private PathFinder pathFinder;
     private List<NavMeshGeneration.Node> path = new List<NavMeshGeneration.Node>();
     private Vector3 targetPos;
-    private bool canStartFollow;
+
     private bool seePlayer;
+    private bool canStartFollow;
+    public bool CanStartFollow { set { canStartFollow = value; } }
 
     private void OnDrawGizmos() {
         Gizmos.color = Color.blue;
@@ -30,6 +34,7 @@ public class EnemyBehaviour : MonoBehaviour
                 }
             }
         }
+  
 
         Gizmos.color = Color.cyan;
         Gizmos.DrawCube(targetPos, Vector3.one * 0.6f);
@@ -41,7 +46,7 @@ public class EnemyBehaviour : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         pathFinder = GetComponent<PathFinder>();
-        Invoke("Init", 4);
+        Invoke("Init", 2);
     }
 
     void Init() {
@@ -74,7 +79,8 @@ public class EnemyBehaviour : MonoBehaviour
             RaycastHit hit;
             Vector3 rayDirection = player.position - transform.position;
            
-            if (Physics.Raycast(transform.position, rayDirection, out hit)) {
+            if (Physics.Raycast(transform.position, rayDirection, out hit,nearDistance, playerMask) && distance > hitDistance) {
+                Debug.Log(hit.transform.tag);
                 if (hit.transform.tag == "Player") {
                     seePlayer = true;
                     currentState = states.followPlayer;
@@ -99,7 +105,7 @@ public class EnemyBehaviour : MonoBehaviour
                 }
             }
 
-            if(distance < 3) {
+            if(distance <= hitDistance) {
                 animator.SetBool("canHit", true);
             }
             else {

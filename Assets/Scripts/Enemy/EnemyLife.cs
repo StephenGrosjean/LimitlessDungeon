@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class EnemyLife : MonoBehaviour
 {
-    [SerializeField] private int life = 100;
+    [SerializeField] private int life;
     [SerializeField] private Renderer renderer;
+    [SerializeField] private GameObject smokeParticles;
+    [SerializeField] private float respawnTime;
 
     private Vector3 backPosition;
     public Vector3 BackPosition { set { backPosition = value; } }
 
     private bool hasBeenKilled;
+    private int startLife;
     // Start is called before the first frame update
     void Start()
     {
-        
+        startLife = life;
     }
 
     // Update is called once per frame
@@ -22,16 +25,14 @@ public class EnemyLife : MonoBehaviour
     {
         if(life <= 0 && !hasBeenKilled) {
             hasBeenKilled = true;
+            Instantiate(smokeParticles, transform.position, Quaternion.identity);
             transform.position = backPosition;
-            life = 100;
+            life = startLife;
+            StartCoroutine("WaitForRespawn");
+            
         }
 
-        if (hasBeenKilled) {
-            renderer.material.color = new Color(renderer.material.color.r, renderer.material.color.g, renderer.material.color.b, 0);
-        }
-        else {
-            renderer.material.color = new Color(renderer.material.color.r, renderer.material.color.g, renderer.material.color.b, 1);
-        }
+        renderer.enabled = !hasBeenKilled;
     }
 
     public void Hit() {
@@ -48,7 +49,9 @@ public class EnemyLife : MonoBehaviour
     }
 
     IEnumerator WaitForRespawn() {
-        yield return new WaitForSeconds(2);
+        GetComponent<EnemyBehaviour>().CanStartFollow = false;
+        yield return new WaitForSeconds(respawnTime);
+        GetComponent<EnemyBehaviour>().CanStartFollow = true;
         hasBeenKilled = false;
     }
 }

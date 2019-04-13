@@ -5,6 +5,7 @@ using TMPro;
 
 public class ChestProperty : MonoBehaviour
 {
+    [SerializeField] private float timeBeforeGiveObject;
     [SerializeField] private LayerMask mask;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private GameObject smokeParticles;
@@ -46,7 +47,7 @@ public class ChestProperty : MonoBehaviour
         if (!isOpen) {
             isOpen = true;
             animator.SetBool("opened", true);
-            Invoke("GiveItem", 2);
+            Invoke("GiveItem", timeBeforeGiveObject);
             Invoke("DestroyMe", 5);
         }
     }

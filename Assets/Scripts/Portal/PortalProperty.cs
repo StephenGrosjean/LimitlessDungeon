@@ -41,6 +41,7 @@ public class PortalProperty : MonoBehaviour
         float height = 0;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, mask)) {
 
+
             height = hit.point.y - 0.1f;
         }
 
@@ -90,7 +91,9 @@ public class PortalProperty : MonoBehaviour
         if (inventorySystem.CheckItem(4) != 0 && goldInside != requirements.GoldRequired) {
             goldInside += inventorySystem.CheckItem(4);
             inventorySystem.RemoveItem(InventorySystem.itemType.gold, inventorySystem.CheckItem(4));
-
+            if (goldInside > requirements.GoldRequired) {
+                goldInside = requirements.GoldRequired;
+            }
             UpdateTexts();
             if (goldInside >= requirements.GoldRequired) {
                 goldKey.SetActive(true);
@@ -105,6 +108,10 @@ public class PortalProperty : MonoBehaviour
             ironInside += inventorySystem.CheckItem(2);
             inventorySystem.RemoveItem(InventorySystem.itemType.iron, inventorySystem.CheckItem(2));
 
+            if(ironInside > requirements.IronRequired) {
+                ironInside = requirements.IronRequired;
+            }
+
             UpdateTexts();
             if (ironInside >= requirements.IronRequired) {
                 ironKey.SetActive(true);
@@ -118,6 +125,10 @@ public class PortalProperty : MonoBehaviour
         if (inventorySystem.CheckItem(3) != 0 && copperInside != requirements.CopperRequired) {
             copperInside += inventorySystem.CheckItem(3);
             inventorySystem.RemoveItem(InventorySystem.itemType.copper, inventorySystem.CheckItem(3));
+
+            if (copperInside > requirements.CopperRequired) {
+                copperInside = requirements.CopperRequired;
+            }
 
             UpdateTexts();
             if (copperInside >= requirements.CopperRequired) {

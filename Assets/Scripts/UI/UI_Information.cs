@@ -13,7 +13,7 @@ public class UI_Information : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textGold, textIron, textCopper;
     private bool canCheck;
     private void Start() {
-        Invoke("LateStart", 0);
+        Invoke("LateStart",2f);
     }
 
     void LateStart()

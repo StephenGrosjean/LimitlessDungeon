@@ -18,6 +18,7 @@ public class NavPoint : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         enemy = GameObject.FindGameObjectWithTag("Enemy").transform;
         Invoke("FindNeighbors", 1);
+       
     }
 
     private void OnDrawGizmos() {

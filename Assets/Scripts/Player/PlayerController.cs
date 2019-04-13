@@ -5,6 +5,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody rigid;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius;
+    [SerializeField] private LayerMask groundCheckMask;
     [SerializeField] private float mouseSensitivity;
     [SerializeField] private float moveSpeed, runSpeed;
     [SerializeField] private float jumpForce;
@@ -13,13 +16,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask digLayer;
     [SerializeField] private float selectDistance;
     [SerializeField] private Animator toolAnimator;
+    [SerializeField] private float hitDistance;
+    [SerializeField] private float mineDistance;
+   
     
     private Animator animator;
     private float currentSpeed;
     private float rotationX = 0;
     private InventorySystem inventorySystem;
+    [SerializeField] private bool isGrounded;
+
     private bool canHitEnemy;
     public bool CanHitEnemy { get { return canHitEnemy; } }
+
+    public bool isDead;
+    public bool IsDead { set { isDead = value; } }
+
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);
+    }
 
     private void Start() {
         rigid = GetComponent<Rigidbody>();
@@ -30,6 +46,14 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update() {
+
+        if(Physics.OverlapSphere(groundCheck.position, groundCheckRadius, groundCheckMask).Length != 0) {
+            isGrounded = true;
+        }
+        else {
+            isGrounded = false;
+        }
+
         bool gamePaused = PauseMenu.instance.GamePaused;
         if (gamePaused) return;
         RaycastHit hit;
@@ -62,8 +86,10 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isRunning", false);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            rigid.velocity = new Vector3(rigid.velocity.x, jumpForce, rigid.velocity.z);
+        //JUMP
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
+            //rigid.velocity = new Vector3(rigid.velocity.x, jumpForce, rigid.velocity.z);
+            rigid.AddForce(Vector2.up * jumpForce, ForceMode.Impulse);
         }
 
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, selectDistance, digLayer)) {
@@ -94,7 +120,7 @@ public class PlayerController : MonoBehaviour
                 //MINE
                 if (inventorySystem.PickaxeActive) {
                     toolAnimator.SetBool("isMining", true);
-                    if (hit.collider.tag == "Wall") {
+                    if (hit.collider.tag == "Wall" && Vector3.Distance(hit.collider.transform.position, transform.position) < mineDistance) {
                         hit.collider.gameObject.GetComponent<CubeProperty>().Hit();
                         hit.collider.gameObject.GetComponent<CubeProperty>().isHitting = true;
                     }
@@ -102,7 +128,7 @@ public class PlayerController : MonoBehaviour
                 //HIT
                 else if(inventorySystem.SwordActive){
                     toolAnimator.SetBool("isHitting", true);
-                    if(hit.collider.tag == "Enemy") {
+                    if(hit.collider.tag == "Enemy" && Vector3.Distance(hit.collider.transform.position, transform.position) < hitDistance) {
                         canHitEnemy = true;
                     }
                     else {
