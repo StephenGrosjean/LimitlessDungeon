@@ -23,20 +23,6 @@ public class NavMeshGeneration : MonoBehaviour
 
     public Node[,] nodes;
 
-    private void OnDrawGizmos() {
-        /*for (int x = 0; x < s; x++) {
-            for (int y = 0; y < s; y++) {
-                if (nodes[x, y].isWaypoint) {
-                    Gizmos.color = Color.blue;
-                }
-                else {
-                    continue;
-                }
-                Gizmos.DrawCube(new Vector3(x, 3, y), Vector3.one);
-            }
-        }*/
-    }
-
     public void GenerateNodes(CellularAutomata.Cell[,] level, int size) {
         nodes = new Node[size, size];
 

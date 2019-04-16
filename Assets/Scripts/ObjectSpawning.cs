@@ -8,10 +8,31 @@ public class ObjectSpawning : MonoBehaviour
     [Range(0,100)]
     [SerializeField] float torchRarety = 97.0f;
     private Vector2 portalSpawnCellPos;
+    public Vector2 PortalSpawnCellPos { get { return portalSpawnCellPos; } }
 
-    public void Start() {
+    //SPAWN THE PORTAL
+    public void SpawnPortal(List<CellularAutomata.Room> rooms, CellularAutomata.Cell[,] map, int size) {
+        CellularAutomata.Cell spawnCell = new CellularAutomata.Cell();
+        spawnCell.isNearWall = true;
+        spawnCell.isBorder = false;
+
+        CellularAutomata.Room spawnRoom = new CellularAutomata.Room();
+        spawnRoom.cells = new List<CellularAutomata.Cell>();
+
+        //spawnRoom = rooms[Random.Range(0, rooms.Count)];
+
+
+        while (spawnCell.isNearWall || spawnCell.isBorder) {
+            spawnCell = map[Random.Range(10, 40), Random.Range(10, 40)];
+        }
+
+        Instantiate(portalObject, new Vector3(spawnCell.position.x, 2, spawnCell.position.y), Quaternion.identity);
         
+        cleanPortalCells(spawnCell, map);
+        portalSpawnCellPos = spawnCell.position;
     }
+
+    //SPAWN TORCHES
     public void SpawnTorches(CellularAutomata.Cell[,] map, int size) {
         for(int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
@@ -27,21 +48,23 @@ public class ObjectSpawning : MonoBehaviour
             }
         }
 
+        //spawn chests
         SpawnChests(map, size);
     }
 
+    //SPAWN CHESTS
     public void SpawnChests(CellularAutomata.Cell[,] map, int size) {
         CellularAutomata.Cell firstCell = new CellularAutomata.Cell();
         firstCell.isNearWall = true;
         firstCell.isBorder = false;
-        while (firstCell.isNearWall || firstCell.isBorder || !firstCell.isAlive || firstCell.position == portalSpawnCellPos) {
+        while (firstCell.isNearWall || firstCell.isBorder || !firstCell.isAlive || firstCell.position == portalSpawnCellPos || Vector2.Distance(firstCell.position, portalSpawnCellPos) < 3) {
             firstCell = map[Random.Range(0, size), Random.Range(0, size)];
         }
 
         CellularAutomata.Cell secondCell = new CellularAutomata.Cell();
         secondCell.isNearWall = true;
         secondCell.isBorder = false;
-        while (secondCell.isNearWall || secondCell.isBorder || !secondCell.isAlive || secondCell.position == firstCell.position || secondCell.position == portalSpawnCellPos) {
+        while (secondCell.isNearWall || secondCell.isBorder || !secondCell.isAlive || secondCell.position == firstCell.position || secondCell.position == portalSpawnCellPos || Vector2.Distance(secondCell.position, portalSpawnCellPos) < 3) {
             secondCell = map[Random.Range(0, size), Random.Range(0, size)];
         }
 
@@ -52,27 +75,7 @@ public class ObjectSpawning : MonoBehaviour
         SecondChest.GetComponent<ChestProperty>().ItemType = InventorySystem.itemType.pickaxe;
     }
 
-    public void SpawnPortal(List<CellularAutomata.Room> rooms, CellularAutomata.Cell[,] map, int size) {
-        CellularAutomata.Cell spawnCell = new CellularAutomata.Cell();
-        spawnCell.isNearWall = true;
-        spawnCell.isBorder = false;
-
-        CellularAutomata.Room spawnRoom = new CellularAutomata.Room();
-        spawnRoom.cells = new List<CellularAutomata.Cell>();
-        
-        //spawnRoom = rooms[Random.Range(0, rooms.Count)];
-        
-        
-        while(spawnCell.isNearWall || spawnCell.isBorder)
-        {
-            spawnCell = map[Random.Range(10, 40), Random.Range(10, 40)];
-        }
-
-        Instantiate(portalObject, new Vector3(spawnCell.position.x, 2, spawnCell.position.y), Quaternion.identity);
-        cleanPortalCells(spawnCell,map);
-        portalSpawnCellPos = spawnCell.position;
-    }
-
+    //CLEAR ALL CELLS NEAR THE PORTAL
     void cleanPortalCells(CellularAutomata.Cell cell, CellularAutomata.Cell[,] map) {
 
         List<CellularAutomata.Cell> cellsToClean = new List<CellularAutomata.Cell>();
@@ -89,7 +92,6 @@ public class ObjectSpawning : MonoBehaviour
                 }
             }
         }
-        Debug.Log(cellsToClean.Count);
 
         GetComponent<CellularAutomata>().ClearPath(cellsToClean, true);
     }

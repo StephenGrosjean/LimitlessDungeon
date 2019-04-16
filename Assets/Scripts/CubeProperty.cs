@@ -49,6 +49,7 @@ public class CubeProperty : MonoBehaviour
                 if (itemType != InventorySystem.itemType.none) {
                     GameObject.FindGameObjectWithTag("Player").GetComponent<InventorySystem>().AddItem(itemType, 1);
                 }
+                SoundManager.instance.PlaySound(SoundManager.sound.Block_Hit);
                 Destroy(gameObject);
             }
 
@@ -59,6 +60,7 @@ public class CubeProperty : MonoBehaviour
 
     IEnumerator canHitAgain() {
         canHit = false;
+        SoundManager.instance.PlaySound(SoundManager.sound.Block_Mine);
         yield return new WaitForSeconds(0.1f);
         canHit = true;
     }

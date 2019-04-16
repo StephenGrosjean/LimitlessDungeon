@@ -5,14 +5,18 @@ using TMPro;
 
 public class PortalProperty : MonoBehaviour
 {
-    private PathFinder enemy;
-    private InventorySystem inventorySystem;
+
     [SerializeField] private LayerMask mask;
     [SerializeField] private GameObject portal;
     [SerializeField] private List<TextMeshProUGUI> goldTexts, copperTexts, ironTexts;
     [SerializeField] private GameObject goldKey, copperKey, ironKey;
     [SerializeField] private List<TextActivator> goldTextActivators, ironTextActivators, copperTextActivators;
+
+    private PathFinder enemy;
+    private InventorySystem inventorySystem;
     private CraftingRequirement requirements;
+
+    
     private int goldInside, ironInside, copperInside;
     public int GoldInside { get { return goldInside; } }
     public int IronInside { get { return ironInside; } }
@@ -20,28 +24,28 @@ public class PortalProperty : MonoBehaviour
 
     private bool goldKeyActived, ironKeyActived, copperKeyActived;
 
+    private bool initialized;
 
-    // Start is called before the first frame update
     void Start()
     {
         requirements = GameObject.FindGameObjectWithTag("GameController").GetComponent<CraftingRequirement>();
         enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<PathFinder>();
         inventorySystem = GameObject.FindGameObjectWithTag("Player").GetComponent<InventorySystem>();
-
-        Invoke("LateStart", 3f);
-
     }
 
+    private void Update() {
+        if(CellularAutomata.instance.FinishedGeneration && !initialized) {
+            initialized = true;
+            Init();
+        }
+    }
 
-    void LateStart() {
+    void Init() {
 
         UpdateTexts();
-
         RaycastHit hit;
         float height = 0;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, mask)) {
-
-
             height = hit.point.y - 0.1f;
         }
 
@@ -57,6 +61,7 @@ public class PortalProperty : MonoBehaviour
 
     private void UpdateActivatorsText() {
         if (goldKeyActived) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Portal_Key_Place);
             foreach (TextActivator text in goldTextActivators) {
                 if (text.CanEnable) {
                     text.CanEnable = false;
@@ -65,6 +70,7 @@ public class PortalProperty : MonoBehaviour
         }
 
         if (ironKeyActived) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Portal_Key_Place);
             foreach (TextActivator text in ironTextActivators) {
                 if (text.CanEnable) {
                     text.CanEnable = false;
@@ -73,6 +79,7 @@ public class PortalProperty : MonoBehaviour
         }
 
         if (copperKeyActived) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Portal_Key_Place);
             foreach (TextActivator text in copperTextActivators) {
                 if (text.CanEnable) {
                     text.CanEnable = false;
@@ -81,6 +88,7 @@ public class PortalProperty : MonoBehaviour
         }
 
         if(copperKeyActived && ironKeyActived && goldKeyActived) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Portal_Open);
             if (!portal.activeInHierarchy) {
                 portal.SetActive(true);
             }
@@ -140,7 +148,7 @@ public class PortalProperty : MonoBehaviour
     }
 
 
-    void UpdateTexts() {
+    public void UpdateTexts() {
         foreach (TextMeshProUGUI text in goldTexts) {
             text.text = goldInside + " / " + requirements.GoldRequired;
         }

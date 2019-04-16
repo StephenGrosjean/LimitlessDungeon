@@ -5,12 +5,25 @@ using UnityEngine;
 
 
 public class CellularAutomata : MonoBehaviour {
+    private bool finishedGeneration;
+    public bool FinishedGeneration { get { return finishedGeneration; } }
+
     [Range(50, 200)] public int size = 50;
     [Range(0, 40)] [SerializeField] int iteration = 10;
     [SerializeField] int maxRoomSearch = 20;
     [SerializeField] int minRoomSize = 20;
     [SerializeField] int borderSize = 2;
     [SerializeField] bool showRooms, showPaths, showRoomConnections;
+
+
+    //SINGLETON//
+    public static CellularAutomata instance;
+
+    private void Awake() {
+        instance = this;
+    }
+    //END SINGLETON//
+
 
     //CELL STRUCT
     public struct Cell {
@@ -262,25 +275,31 @@ public class CellularAutomata : MonoBehaviour {
         }
 
 
+
+
         //Spawn portal
         GetComponent<ObjectSpawning>().SpawnPortal(rooms, cells, size);
 
+        //Portal position
+        Vector2 portalPos = GetComponent<ObjectSpawning>().PortalSpawnCellPos;
 
-        //Generate tilemap
+        //Generate randomSpawn
+        Cell PlayerSpawn = GenerateSpawn(portalPos, Vector2.zero, 10, 5);
+        Cell EnemySpawn = GenerateSpawn(portalPos, PlayerSpawn.position, 30, 20);
+
+        //Generate cubemap
         isRunning = false;
         Texture2D noise = GetComponent<PerlinNoise>().GenerateTexture();
         GetComponent<CubeMapGenerator>().Generate(cells, size, noise);
 
-        //Generate randomSpawn
-        Cell Spawn = GenerateSpawn();
-
         //Spawn the player
-        GameController.instance.SpawnPlayer(Spawn.position);
+        //GameController.instance.SpawnPlayer(PlayerSpawn.position);
+        GameController.instance.SpawnPlayer(new Vector2(portalPos.x, portalPos.y+3));
 
-        Cell Spawn2 = GenerateSpawn();
         //Spawn the enemy
-        GameController.instance.SpawnEnemy(Spawn2.position);
+        GameController.instance.SpawnEnemy(EnemySpawn.position);
 
+        finishedGeneration = true;
 
     }
 
@@ -494,22 +513,50 @@ public class CellularAutomata : MonoBehaviour {
     //Clean path
     public void ClearPath(List<Cell> path, bool triggerTorchSpawning = false) {
         foreach (Cell c in path) {
-            if (!c.isAlive) {
+            if (!c.isAlive && !c.isBorder) {
                 cells[c.position.x, c.position.y].isAlive = true;
                 List<Cell> neighbors = FindNeighbors(c);
+
                 foreach (Cell nc in neighbors) {
-                    if (!nc.isAlive) {
+                    if (!nc.isAlive && !nc.isBorder && !(nc.position.x < 1) && !(nc.position.y < 1) && !(nc.position.x > size) && !(nc.position.y > size)) {
                         cells[nc.position.x, nc.position.y].isAlive = true;
 
-                        cells[nc.position.x + 1, nc.position.y].canPutTorch = false;
-                        cells[nc.position.x - 1, nc.position.y].canPutTorch = false;
-                        cells[nc.position.x, nc.position.y + 1].canPutTorch = false;
-                        cells[nc.position.x, nc.position.y - 1].canPutTorch = false;
+                        if (nc.position.x + 1 <= size) {
+                            cells[nc.position.x + 1, nc.position.y].canPutTorch = false;
+                        }
 
-                        cells[nc.position.x + 1, nc.position.y - 1].canPutTorch = false;
-                        cells[nc.position.x - 1, nc.position.y - 1].canPutTorch = false;
-                        cells[nc.position.x + 1, nc.position.y + 1].canPutTorch = false;
-                        cells[nc.position.x - 1, nc.position.y - 1].canPutTorch = false;
+                        if(nc.position.x - 1 >= 0) {
+                            cells[nc.position.x - 1, nc.position.y].canPutTorch = false;
+                        }
+
+                        if(nc.position.y + 1 <= size) {
+                            cells[nc.position.x, nc.position.y + 1].canPutTorch = false;
+
+                        }
+
+
+                        if(nc.position.y - 1 >= 0) {
+                            cells[nc.position.x, nc.position.y - 1].canPutTorch = false;
+                        }
+
+                        if(nc.position.x + 1 <= size && nc.position.y - 1 >= 0) {
+                            cells[nc.position.x + 1, nc.position.y - 1].canPutTorch = false;
+
+                        }
+
+                        if (nc.position.x - 1 >= 0 && nc.position.y - 1 >= 0) {
+                            cells[nc.position.x - 1, nc.position.y - 1].canPutTorch = false;
+
+                        }
+
+                        if (nc.position.x + 1 <= size && nc.position.y + 1 <= size) {
+                            cells[nc.position.x + 1, nc.position.y + 1].canPutTorch = false;
+
+                        }
+
+                        if (nc.position.x - 1 >= 0 && nc.position.y - 1 >= 0) {
+                            cells[nc.position.x - 1, nc.position.y - 1].canPutTorch = false;
+                        }
 
 
 
@@ -621,10 +668,12 @@ public class CellularAutomata : MonoBehaviour {
 
 
     //Generate Spawn
-    Cell GenerateSpawn() {
+    Cell GenerateSpawn(Vector2 awayFrom1, Vector2 awayFrom2, int away1Distance = 5, int away2Distance = 5) {
         List<Cell> aliveCells = new List<Cell>();
+        Cell spawnCell = new Cell();
+        
 
-        for(int x=0; x < size; x++) {
+        for (int x=0; x < size; x++) {
             for(int y = 0; y < size; y++) {
                 if (cells[x, y].isAlive && !cells[x,y].isNearWall) {
                     aliveCells.Add(cells[x, y]);
@@ -632,6 +681,11 @@ public class CellularAutomata : MonoBehaviour {
             }
         }
 
-        return aliveCells[Random.Range(0, aliveCells.Count - 1)];
+        spawnCell = aliveCells[Random.Range(0, aliveCells.Count - 1)];
+
+        while (Vector2.Distance(spawnCell.position, awayFrom1) < away1Distance && Vector2.Distance(spawnCell.position, awayFrom2) < away2Distance && spawnCell.position != Vector2.zero) {
+            spawnCell = aliveCells[Random.Range(0, aliveCells.Count - 1)];
+        }
+        return spawnCell;
     }
 }

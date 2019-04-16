@@ -9,6 +9,7 @@ public class PortalLevel : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) {
         if(other.tag == "Player") {
+            SoundManager.instance.PlaySound(SoundManager.sound.Portal_Enter);
             GameController.instance.StartCoroutine("FadeToBlack");
             LevelCounter.instance.NextLevel();
             Time.timeScale = 0;

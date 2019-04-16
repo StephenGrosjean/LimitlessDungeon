@@ -17,6 +17,8 @@ public class InventorySystem : MonoBehaviour
     /// </summary>
 
     private static int inventorySize = 6;
+    [SerializeField] private Sprite select1, select2;
+    [SerializeField] private Image inventoryImage;
     [SerializeField] private Sprite goldSprite, ironSprite, copperSprite, pickaxeSprite, swordSprite, emptySprite;
     public enum itemType { none, gold, iron, copper, pickaxe, sword};
 
@@ -84,6 +86,7 @@ public class InventorySystem : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             //Select pickaxe
             if(inventory[0].number != 0) {
+                inventoryImage.sprite = select1;
                 pickaxeObject.SetActive(true);
                 swordObject.SetActive(false);
                 pickaxeActive = true;
@@ -98,6 +101,7 @@ public class InventorySystem : MonoBehaviour
         //Select sword
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
             if (inventory[1].number != 0) {
+                inventoryImage.sprite = select2;
                 pickaxeObject.SetActive(false);
                 swordObject.SetActive(true);
                 pickaxeActive = false;

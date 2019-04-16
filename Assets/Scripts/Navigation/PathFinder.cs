@@ -14,35 +14,32 @@ public class PathFinder : MonoBehaviour
     public NavMeshGeneration.Node[,] nodes;
     private NavMeshGeneration.Node currentNodeExamined;
     private bool finished;
+    private bool initialized;
     
     private void OnDrawGizmos() {
         if (!asStart || !asEnd || hideGizmo) return;
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(new Vector3(startNode.pos.x,9, startNode.pos.y), Vector3.one * 0.5f);
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawCube(new Vector3(endNode.pos.x, 9, endNode.pos.y), Vector3.one * 0.5f);
 
         foreach (NavMeshGeneration.Node node in nodes) {
             if (node == null) continue;            
 
             if (node.hasBeenVisited) {
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawWireCube(new Vector3(node.pos.x, 6, node.pos.y), Vector3.one * 0.75f);
+                Gizmos.DrawCube(new Vector3(node.pos.x, 6, node.pos.y), Vector3.one * 0.75f);
             }
 
             if (node.isPath) {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireCube(new Vector3(node.pos.x, 6, node.pos.y), Vector3.one * 0.75f);
+                Gizmos.DrawCube(new Vector3(node.pos.x, 6, node.pos.y), Vector3.one * 0.75f);
             }
 
             if (!node.isPath && !node.hasBeenVisited) {
                 Gizmos.color = Color.grey;
-                Gizmos.DrawWireCube(new Vector3(node.pos.x, 6, node.pos.y), Vector3.one * 0.75f);
+                Gizmos.DrawCube(new Vector3(node.pos.x, 6, node.pos.y), Vector3.one * 0.75f);
             }
 
 
-            Gizmos.color = Color.gray;
+            Gizmos.color = Color.white;
             foreach (NavMeshGeneration.Node nodeNeighbor in node.neighbors) {
                 Gizmos.DrawLine(new Vector3(node.pos.x, 7, node.pos.y), new Vector3(nodeNeighbor.pos.x, 7, nodeNeighbor.pos.y));
             }
@@ -53,6 +50,13 @@ public class PathFinder : MonoBehaviour
                         Gizmos.DrawLine(new Vector3(node.pos.x, 7, node.pos.y), new Vector3(node.cameFrom.pos.x, 7, node.cameFrom.pos.y));
                     }
                 }
+
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawCube(new Vector3(startNode.pos.x, 9, startNode.pos.y), Vector3.one * 0.5f);
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawCube(new Vector3(endNode.pos.x, 9, endNode.pos.y), Vector3.one * 0.5f);
 
             /*Gizmos.color = Color.magenta;
             Gizmos.DrawWireCube(new Vector3(currentNodeExamined.pos.x, 6, currentNodeExamined.pos.y), Vector3.one * 0.75f);*/
@@ -70,8 +74,11 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-    private void Start() {
-        Invoke("Init", 2);
+    private void Update() {
+        if(CellularAutomata.instance.FinishedGeneration && !initialized) {
+            initialized = true;
+            Init();
+        }
     }
 
     private void Init() {

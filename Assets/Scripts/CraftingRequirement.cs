@@ -13,9 +13,25 @@ public class CraftingRequirement : MonoBehaviour
     [Range(0, 100)]
     [SerializeField] private int percentageGold, percentageIron, percentageCopper;
 
-    // Start is called before the first frame update
+   [SerializeField] private int maxPercentageGold, maxPercentageIron, maxPercentageCopper;
+
     void Start()
     {
+        
+        percentageGold = LevelCounter.instance.LevelID + 15;
+        percentageIron = LevelCounter.instance.LevelID + 7;
+        percentageCopper = LevelCounter.instance.LevelID + 5;
+
+        if(percentageGold > maxPercentageGold) {
+            percentageGold = maxPercentageGold;
+        }
+        if (percentageIron > maxPercentageIron) {
+            percentageIron = maxPercentageIron;
+        }
+        if (percentageCopper > maxPercentageCopper) {
+            percentageCopper = maxPercentageCopper;
+        }
+
         Invoke("LateStart", 1);
        
     }
@@ -32,5 +48,7 @@ public class CraftingRequirement : MonoBehaviour
         goldRequired = Mathf.RoundToInt((goldCount * percentageGold)/100);
         ironRequired = Mathf.RoundToInt((ironCount * percentageIron) / 100);
         copperRequired = Mathf.RoundToInt((copperCount * percentageCopper) / 100);
+
+        GameObject.FindGameObjectWithTag("Portal").GetComponent<PortalProperty>().UpdateTexts();
     }
 }

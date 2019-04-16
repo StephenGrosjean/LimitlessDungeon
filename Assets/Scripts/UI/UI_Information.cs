@@ -11,6 +11,8 @@ public class UI_Information : MonoBehaviour
     [SerializeField] private CraftingRequirement craftingRequirement;
     [SerializeField] private PortalProperty portalProperty;
     [SerializeField] private TextMeshProUGUI textGold, textIron, textCopper;
+    [SerializeField] private TextMeshProUGUI textLevel;
+
     private bool canCheck;
     private void Start() {
         Invoke("LateStart",2f);
@@ -20,6 +22,7 @@ public class UI_Information : MonoBehaviour
     {
         portalProperty = GameObject.FindGameObjectWithTag("Portal").GetComponent<PortalProperty>();
         canCheck = true;
+        textLevel.text = "You survived for " + LevelCounter.instance.LevelID + " levels";
     }
 
     void Update()

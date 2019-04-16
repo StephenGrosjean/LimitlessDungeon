@@ -32,6 +32,8 @@ public class PlayerController : MonoBehaviour
     public bool isDead;
     public bool IsDead { set { isDead = value; } }
 
+    private bool canPlaySwing;
+
     private void OnDrawGizmos() {
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(groundCheck.position, groundCheckRadius);
@@ -43,6 +45,7 @@ public class PlayerController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         inventorySystem = GetComponent<InventorySystem>();
+
     }
 
     void Update() {
@@ -116,6 +119,8 @@ public class PlayerController : MonoBehaviour
 
             }
 
+
+            //MOUSE CONTROLS
             if (Input.GetMouseButton(0)) {
                 //MINE
                 if (inventorySystem.PickaxeActive) {
@@ -128,7 +133,7 @@ public class PlayerController : MonoBehaviour
                 //HIT
                 else if(inventorySystem.SwordActive){
                     toolAnimator.SetBool("isHitting", true);
-                    if(hit.collider.tag == "Enemy" && Vector3.Distance(hit.collider.transform.position, transform.position) < hitDistance) {
+                    if (hit.collider.tag == "Enemy" && Vector3.Distance(hit.collider.transform.position, transform.position) < hitDistance) {
                         canHitEnemy = true;
                     }
                     else {
@@ -141,12 +146,11 @@ public class PlayerController : MonoBehaviour
                 toolAnimator.SetBool("isHitting", false);
             }
 
-            if (Input.GetMouseButtonUp(0)) {
+            if (Input.GetMouseButtonUp(0) || Input.GetMouseButton(1)) {
                 toolAnimator.SetBool("isMining", false);
                 toolAnimator.SetBool("isHitting", false);
             }
         }
     }
-
 
 }

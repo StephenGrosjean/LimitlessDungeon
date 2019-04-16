@@ -42,7 +42,8 @@ public class EnemyBehaviour : MonoBehaviour
 
     void Start()
     {
-        
+        InvokeRepeating("Growl", 30, 60);
+        speed += LevelCounter.instance.LevelID / 4;
         rb = GetComponent<Rigidbody>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         pathFinder = GetComponent<PathFinder>();
@@ -55,7 +56,7 @@ public class EnemyBehaviour : MonoBehaviour
     }
 
     void FindPath() {
-        //StartCoroutine(pathFinder.FindPath());
+        //StartCoroutine(pathFinder.FindPath()); //IF I WANT TO SHOW HOW THE PATH IS GENERATING
         path = pathFinder.FindPath();
         NextNode();
     }
@@ -137,5 +138,12 @@ public class EnemyBehaviour : MonoBehaviour
 
     bool ValidatePosition(Vector3 pos1, Vector3 pos2, float allowedDistance) {
         return Vector3.Distance(pos1, pos2) < allowedDistance;
+    }
+
+    void Growl() {
+        float random = Random.Range(0.0f, 100.0f);
+        if (random > 70) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Enemy_Growl);
+        }
     }
 }

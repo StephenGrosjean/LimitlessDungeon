@@ -66,6 +66,7 @@ public class CubeMapGenerator : MonoBehaviour
 
         gameController.canClean = true;
 
+        //Generate NavMap
         GetComponent<NavMeshGeneration>().GenerateNodes(world, size);
     }
 

@@ -7,6 +7,7 @@ public class OccludedObject : MonoBehaviour
 
     [SerializeField] private float displayTime;
     [SerializeField] private MeshRenderer rendererToOcclude;
+    [SerializeField] private bool disableScript;
 
     void OnEnable()
     {
@@ -24,8 +25,10 @@ public class OccludedObject : MonoBehaviour
     }
 
     public void HitOcclude(float time) {
-        displayTime = time;
-        rendererToOcclude.enabled = true;
+        if (!disableScript) {
+            displayTime = time;
+            rendererToOcclude.enabled = true;
+        }
     }
 
 

@@ -72,6 +72,7 @@ MonoBehaviour:
   isHitting: 0
   isSelected: 0
   isInvincible: 0
+  itemType: 0
   tier3: {r: 1, g: 1, b: 1, a: 1}
   tier2: {r: 1, g: 0.5424528, b: 0.5424528, a: 1}
   tier1: {r: 1, g: 0.25943398, b: 0.25943398, a: 1}
@@ -90,6 +91,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayTime: 0
   rendererToOcclude: {fileID: 1808698979051032074}
+  disableScript: 0
 --- !u!1001 &1808698979048871530
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -144,6 +146,10 @@ PrefabInstance:
     - target: {fileID: 400002, guid: 866e0fb775005fa4fa8a99ac9ea9dabd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 866e0fb775005fa4fa8a99ac9ea9dabd, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 866e0fb775005fa4fa8a99ac9ea9dabd, type: 3}

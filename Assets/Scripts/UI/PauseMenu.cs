@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-
     [SerializeField] private GameObject pauseMenu;
     private bool gamePaused;
     public bool GamePaused { get { return gamePaused; } }
@@ -19,13 +16,6 @@ public class PauseMenu : MonoBehaviour
     }
     //END SINGLETON//
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
         pauseMenu.SetActive(gamePaused);
@@ -34,10 +24,12 @@ public class PauseMenu : MonoBehaviour
         }
 
         if (gamePaused) {
+            Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             Time.timeScale = 0;
         }
         else {
+            Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             Time.timeScale = 1;
         }
@@ -45,16 +37,19 @@ public class PauseMenu : MonoBehaviour
 
 
     public void Restart() {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SoundManager.instance.PlaySound(SoundManager.sound.Button_Click);
         LevelCounter.instance.ResetCounter();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void Menu() {
-        SceneManager.LoadScene("MainMenu");
+        SoundManager.instance.PlaySound(SoundManager.sound.Button_Click);
         LevelCounter.instance.DestroyCounter();
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void Continue() {
+        SoundManager.instance.PlaySound(SoundManager.sound.Button_Click);
         gamePaused = !gamePaused;
     }
 

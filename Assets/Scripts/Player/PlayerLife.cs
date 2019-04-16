@@ -13,17 +13,16 @@ public class PlayerLife : MonoBehaviour
 
     private bool wasHit;
     private float alpha;
-    private float fullLife;
+    private int fullLife;
 
-    // Start is called before the first frame update
     void Start()
     {
         fullLife = life;
     }
 
-    // Update is called once per frame
     void Update() {
         if (life <= 0) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Player_Die);
             Time.timeScale = 0;
             deathUI.SetActive(true);
         }
@@ -33,6 +32,7 @@ public class PlayerLife : MonoBehaviour
 
     public void Hit() {
         life--;
+        SoundManager.instance.PlaySound(SoundManager.sound.Player_Hit);
         damageUI.fillAmount = life / fullLife;
         if (!wasHit) {
             wasHit = true;
@@ -42,7 +42,7 @@ public class PlayerLife : MonoBehaviour
 
     IEnumerator DamageOverlay() {
         alpha = 1f;
-        while (alpha > 0.0f) {
+        while (alpha > -0.1f) {
             damageOverlay.color = new Color(1, 1, 1, alpha);
             yield return null;
             alpha -= 0.1f;

@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyLife : MonoBehaviour
 {
     [SerializeField] private int life;
-    [SerializeField] private Renderer renderer;
+    [SerializeField] private Renderer rd;
     [SerializeField] private GameObject smokeParticles;
     [SerializeField] private float respawnTime;
 
@@ -14,16 +14,16 @@ public class EnemyLife : MonoBehaviour
 
     private bool hasBeenKilled;
     private int startLife;
-    // Start is called before the first frame update
+
     void Start()
     {
         startLife = life;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(life <= 0 && !hasBeenKilled) {
+            SoundManager.instance.PlaySound(SoundManager.sound.Enemy_Die);
             hasBeenKilled = true;
             Instantiate(smokeParticles, transform.position, Quaternion.identity);
             transform.position = backPosition;
@@ -32,20 +32,18 @@ public class EnemyLife : MonoBehaviour
             
         }
 
-        renderer.enabled = !hasBeenKilled;
+        rd.enabled = !hasBeenKilled;
     }
 
     public void Hit() {
         life--;
         StartCoroutine("HitColor");
-        Debug.Log("Hit : " + life);
     }
 
     IEnumerator HitColor() {
-        renderer.material.color = Color.red;
+        rd.material.color = Color.red;
         yield return new WaitForSeconds(0.1f);
-        renderer.material.color = Color.white;
-
+        rd.material.color = Color.white;
     }
 
     IEnumerator WaitForRespawn() {
@@ -53,5 +51,6 @@ public class EnemyLife : MonoBehaviour
         yield return new WaitForSeconds(respawnTime);
         GetComponent<EnemyBehaviour>().CanStartFollow = true;
         hasBeenKilled = false;
+        Instantiate(smokeParticles, transform.position, Quaternion.identity);
     }
 }

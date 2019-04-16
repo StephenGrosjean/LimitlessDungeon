@@ -9,6 +9,7 @@ public class ChestProperty : MonoBehaviour
     [SerializeField] private LayerMask mask;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private GameObject smokeParticles;
+    [SerializeField] private GameObject swordObject, pickaxeObject;
 
     [SerializeField] private InventorySystem.itemType itemType;
     public InventorySystem.itemType ItemType { set { itemType = value; } }
@@ -18,19 +19,33 @@ public class ChestProperty : MonoBehaviour
     private GameObject player;
     private PathFinder enemy;
 
+    private bool initialized;
+
     private void Start() {
         animator = GetComponent<Animator>();
         enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<PathFinder>();
         player = GameObject.FindGameObjectWithTag("Player");
 
-        Invoke("LateStart",3f);
+        if(itemType == InventorySystem.itemType.pickaxe) {
+            pickaxeObject.SetActive(true);
+        }
+        else if(itemType == InventorySystem.itemType.sword){
+            swordObject.SetActive(true);
+        }
+
+
     }
 
     private void Update() {
         text.enabled = isHit;
+
+        if (CellularAutomata.instance.FinishedGeneration && !initialized) {
+            initialized = true;
+            Init();
+        }
     }
 
-    void LateStart() {
+    void Init() {
         RaycastHit hit;
         float height = 0;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, mask)) {
@@ -45,6 +60,7 @@ public class ChestProperty : MonoBehaviour
     
     public void OpenChest() {
         if (!isOpen) {
+           
             isOpen = true;
             animator.SetBool("opened", true);
             Invoke("GiveItem", timeBeforeGiveObject);
@@ -67,7 +83,18 @@ public class ChestProperty : MonoBehaviour
     }
 
     void GiveItem() {
+
         player.GetComponent<InventorySystem>().AddItem(itemType, 1);
+        SoundManager.instance.PlaySound(SoundManager.sound.Item_Pick);
+        Invoke("DisableInsideObject", 0.5f);
     }
 
+    void DisableInsideObject() {
+        if (itemType == InventorySystem.itemType.pickaxe) {
+            pickaxeObject.SetActive(false);
+        }
+        else {
+            swordObject.SetActive(false);
+        }
+    }
 }
