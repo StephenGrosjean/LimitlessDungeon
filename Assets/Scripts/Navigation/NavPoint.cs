@@ -9,7 +9,8 @@ public class NavPoint : MonoBehaviour
 
     private bool isNearWall;
     public bool IsNearWall {  get { return isNearWall; } set { isNearWall = value; } }
-    public List<Transform> neighbors = new List<Transform>();
+
+    private List<Transform> neighbors = new List<Transform>();
     private Transform player, enemy;
     private bool called, isInside;
 
@@ -18,7 +19,6 @@ public class NavPoint : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         enemy = GameObject.FindGameObjectWithTag("Enemy").transform;
         Invoke("FindNeighbors", 1);
-       
     }
 
     private void OnDrawGizmos() {
@@ -46,8 +46,11 @@ public class NavPoint : MonoBehaviour
 
     private void OnTriggerStay(Collider other) {
         if(other.tag == "Enemy") {
-            if (enemy.gameObject.GetComponent<EnemyBehaviour>().CurrentNode.pos == new Vector2(transform.position.x, transform.position.z)) {
-                enemy.gameObject.GetComponent<EnemyBehaviour>().NextNode();
+            EnemyBehaviour enemyBehaviourScript = enemy.gameObject.GetComponent<EnemyBehaviour>();
+            if (enemyBehaviourScript.CurrentNode != null) {
+                if (enemyBehaviourScript.CurrentNode.pos == new Vector2(transform.position.x, transform.position.z)) {
+                    enemyBehaviourScript.NextNode();
+                }
             }
         }
     }

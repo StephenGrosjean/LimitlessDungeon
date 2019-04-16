@@ -7,7 +7,6 @@ public class MusicPlayer : MonoBehaviour
 {
     [SerializeField] private AudioClip menuMusic, gameMusic;
     private AudioSource source;
-
     private bool firstLevelReached;
 
     void Start()

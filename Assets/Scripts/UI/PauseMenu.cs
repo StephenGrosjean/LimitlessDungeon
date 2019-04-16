@@ -7,6 +7,7 @@ public class PauseMenu : MonoBehaviour
     private bool gamePaused;
     public bool GamePaused { get { return gamePaused; } }
 
+    private PlayerLife playerLife;
 
     //SINGLETON//
     public static PauseMenu instance;
@@ -16,22 +17,29 @@ public class PauseMenu : MonoBehaviour
     }
     //END SINGLETON//
 
+    private void Start() {
+        playerLife = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerLife>();
+    }
+
     void Update()
     {
-        pauseMenu.SetActive(gamePaused);
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            gamePaused = !gamePaused;
-        }
+        if (!playerLife.Dead) {
+            pauseMenu.SetActive(gamePaused);
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                gamePaused = !gamePaused;
+            }
 
-        if (gamePaused) {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-            Time.timeScale = 0;
-        }
-        else {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-            Time.timeScale = 1;
+
+            if (gamePaused) {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                Time.timeScale = 0;
+            }
+            else {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                Time.timeScale = 1;
+            }
         }
     }
 

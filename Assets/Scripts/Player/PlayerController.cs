@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public bool IsDead { set { isDead = value; } }
 
     private bool canPlaySwing;
+    private PlayerLife playerLife;
 
     private void OnDrawGizmos() {
         Gizmos.color = Color.blue;
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Start() {
+        playerLife = GetComponent<PlayerLife>();
         rigid = GetComponent<Rigidbody>();
         animator = Camera.main.GetComponent<Animator>();
 
@@ -58,7 +60,7 @@ public class PlayerController : MonoBehaviour
         }
 
         bool gamePaused = PauseMenu.instance.GamePaused;
-        if (gamePaused) return;
+        if (gamePaused || playerLife.Dead) return;
         RaycastHit hit;
         rotationX += Input.GetAxis("Mouse Y") * mouseSensitivity;
         rotationX = Mathf.Clamp(rotationX, -80.0f, 80.0f);

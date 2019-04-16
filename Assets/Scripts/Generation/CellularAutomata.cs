@@ -10,11 +10,13 @@ public class CellularAutomata : MonoBehaviour {
 
     [Range(50, 200)] public int size = 50;
     [Range(0, 40)] [SerializeField] int iteration = 10;
-    [SerializeField] int maxRoomSearch = 20;
-    [SerializeField] int minRoomSize = 20;
-    [SerializeField] int borderSize = 2;
-    [SerializeField] bool showRooms, showPaths, showRoomConnections;
+    [SerializeField] private int maxRoomSearch = 20;
+    [SerializeField] private int minRoomSize = 20;
+    [SerializeField] private int borderSize = 2;
+    [SerializeField] private bool showRooms, showPaths, showRoomConnections;
 
+
+    private ObjectSpawning objectSpawning;
 
     //SINGLETON//
     public static CellularAutomata instance;
@@ -64,6 +66,8 @@ public class CellularAutomata : MonoBehaviour {
     private List<Color> colors;
 
     void Start() {
+        objectSpawning = GetComponent<ObjectSpawning>();
+
         cells = new Cell[size, size];
 
         colors = new List<Color> {
@@ -278,14 +282,13 @@ public class CellularAutomata : MonoBehaviour {
 
 
         //Spawn portal
-        GetComponent<ObjectSpawning>().SpawnPortal(rooms, cells, size);
+        objectSpawning.SpawnPortal(rooms, cells, size);
 
         //Portal position
-        Vector2 portalPos = GetComponent<ObjectSpawning>().PortalSpawnCellPos;
+        Vector2 portalPos = objectSpawning.PortalSpawnCellPos;
 
         //Generate randomSpawn
-        Cell PlayerSpawn = GenerateSpawn(portalPos, Vector2.zero, 10, 5);
-        Cell EnemySpawn = GenerateSpawn(portalPos, PlayerSpawn.position, 30, 20);
+        Cell EnemySpawn = GenerateSpawn(20, portalPos);
 
         //Generate cubemap
         isRunning = false;
@@ -567,7 +570,7 @@ public class CellularAutomata : MonoBehaviour {
         }
 
         if (triggerTorchSpawning) {
-            GetComponent<ObjectSpawning>().SpawnTorches(cells, size);
+            objectSpawning.SpawnTorches(cells, size);
         }
     }
 
@@ -668,10 +671,10 @@ public class CellularAutomata : MonoBehaviour {
 
 
     //Generate Spawn
-    Cell GenerateSpawn(Vector2 awayFrom1, Vector2 awayFrom2, int away1Distance = 5, int away2Distance = 5) {
+    Cell GenerateSpawn(int awayPerimeter, Vector2 centerPos) {
         List<Cell> aliveCells = new List<Cell>();
         Cell spawnCell = new Cell();
-        
+        spawnCell.position = Vector2Int.zero;
 
         for (int x=0; x < size; x++) {
             for(int y = 0; y < size; y++) {
@@ -681,11 +684,11 @@ public class CellularAutomata : MonoBehaviour {
             }
         }
 
-        spawnCell = aliveCells[Random.Range(0, aliveCells.Count - 1)];
 
-        while (Vector2.Distance(spawnCell.position, awayFrom1) < away1Distance && Vector2.Distance(spawnCell.position, awayFrom2) < away2Distance && spawnCell.position != Vector2.zero) {
+        while(Vector2.Distance(spawnCell.position, centerPos) < awayPerimeter || spawnCell.position == Vector2.zero) {
             spawnCell = aliveCells[Random.Range(0, aliveCells.Count - 1)];
         }
+
         return spawnCell;
     }
 }

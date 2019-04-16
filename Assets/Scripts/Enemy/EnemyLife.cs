@@ -15,8 +15,13 @@ public class EnemyLife : MonoBehaviour
     private bool hasBeenKilled;
     private int startLife;
 
+    private Animator animator;
+    private EnemyBehaviour enemyBehaviour;
+
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
+        enemyBehaviour = GetComponent<EnemyBehaviour>();
         startLife = life;
     }
 
@@ -47,9 +52,10 @@ public class EnemyLife : MonoBehaviour
     }
 
     IEnumerator WaitForRespawn() {
-        GetComponent<EnemyBehaviour>().CanStartFollow = false;
+        animator.SetBool("canHit", false);
+        enemyBehaviour.CanStartFollow = false;
         yield return new WaitForSeconds(respawnTime);
-        GetComponent<EnemyBehaviour>().CanStartFollow = true;
+        enemyBehaviour.CanStartFollow = true;
         hasBeenKilled = false;
         Instantiate(smokeParticles, transform.position, Quaternion.identity);
     }

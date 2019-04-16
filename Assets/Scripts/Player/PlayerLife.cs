@@ -13,7 +13,9 @@ public class PlayerLife : MonoBehaviour
 
     private bool wasHit;
     private float alpha;
-    private int fullLife;
+    private float fullLife;
+    private bool dead;
+    public bool Dead { get { return dead; } }
 
     void Start()
     {
@@ -21,12 +23,16 @@ public class PlayerLife : MonoBehaviour
     }
 
     void Update() {
-        if (life <= 0) {
+        if (life <= 0 && !dead) {
+            dead = true;
             SoundManager.instance.PlaySound(SoundManager.sound.Player_Die);
             Time.timeScale = 0;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
             deathUI.SetActive(true);
         }
 
+        
         
     }
 

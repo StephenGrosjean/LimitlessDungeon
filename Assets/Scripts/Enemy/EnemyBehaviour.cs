@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
-    public states currentState = states.followPath;
+    [SerializeField] private states currentState = states.followPath;
     public enum states { followPath, followPlayer };
     private states lastState;
+
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private Animator animator;
     [SerializeField] private float nearDistance;
@@ -20,8 +21,8 @@ public class EnemyBehaviour : MonoBehaviour
     private PathFinder pathFinder;
     private List<NavMeshGeneration.Node> path = new List<NavMeshGeneration.Node>();
     private Vector3 targetPos;
-
     private bool seePlayer;
+
     private bool canStartFollow;
     public bool CanStartFollow { set { canStartFollow = value; } }
 
@@ -81,7 +82,6 @@ public class EnemyBehaviour : MonoBehaviour
             Vector3 rayDirection = player.position - transform.position;
            
             if (Physics.Raycast(transform.position, rayDirection, out hit,nearDistance, playerMask) && distance > hitDistance) {
-                Debug.Log(hit.transform.tag);
                 if (hit.transform.tag == "Player") {
                     seePlayer = true;
                     currentState = states.followPlayer;
@@ -129,6 +129,7 @@ public class EnemyBehaviour : MonoBehaviour
 
 
     IEnumerator LostPlayer() {
+        animator.SetBool("canHit", false);
         yield return new WaitForSeconds(0.5f);
         Debug.Log("#ENEMY BEHAVIOUR# Lost player, finding a new path");
         if (currentState == states.followPath) {

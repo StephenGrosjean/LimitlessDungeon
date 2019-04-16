@@ -6,6 +6,7 @@ public class CubeMapGenerator : MonoBehaviour
 {
     [SerializeField] private int percentageGoldOre, percentageCopperOre, percentageIronOre;
     [SerializeField] private GameObject ground, wall, goldOre, copperOre, ironOre;
+    [SerializeField] private Transform wallContainer, floorContainer;
 
     [SerializeField] private GameController gameController;
 
@@ -18,12 +19,13 @@ public class CubeMapGenerator : MonoBehaviour
                 if (world[x, z].isAlive) {
                     float height = heightColor.grayscale * 1.2f;
                     GameObject cube = Instantiate(ground, new Vector3(x, height, z), Quaternion.identity);
+                    cube.transform.parent = floorContainer;
                     gameController.cubes[x, 0, z] = cube;
                 }
                 else {
                     for (int i = 0; i < 10; i++) {
                         GameObject cube;
-
+                        
                         if(world[x,z].neighborsNumber > 0 && i <= 4 && i > 1 && !world[x,z].isBorder) {
                             int RDMN = Random.Range(0, 100);
 
@@ -59,6 +61,7 @@ public class CubeMapGenerator : MonoBehaviour
                             cube.GetComponent<CubeProperty>().isInvincible = true;
                         }
                         gameController.cubes[x, i ,z] = cube;
+                        cube.transform.parent = wallContainer;
                     }
                 }
             }

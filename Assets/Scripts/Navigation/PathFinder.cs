@@ -19,7 +19,6 @@ public class PathFinder : MonoBehaviour
     private void OnDrawGizmos() {
         if (!asStart || !asEnd || hideGizmo) return;
 
-
         foreach (NavMeshGeneration.Node node in nodes) {
             if (node == null) continue;            
 
