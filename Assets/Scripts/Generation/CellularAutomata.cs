@@ -119,7 +119,7 @@ public class CellularAutomata : MonoBehaviour {
 
     void Cellular() {
         BoundsInt bounds = new BoundsInt(-1, -1, 0, 3, 3, 1);
-
+        
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 int aliveNeighbours = 0;
@@ -379,7 +379,7 @@ public class CellularAutomata : MonoBehaviour {
     #endregion
 
 
-
+    
     //##### UTILITY FUNCTIONS #####
 
     //Remove Smaller rooms

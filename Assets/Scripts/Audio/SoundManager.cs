@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
-
+/// <summary>
+/// Singleton for playing sound effects
+/// </summary>
 public class SoundManager : MonoBehaviour
 {
 
@@ -58,7 +60,6 @@ public class SoundManager : MonoBehaviour
 
     
 
-    // Start is called before the first frame update
     void Start()
     {
         source = GetComponent<AudioSource>();
@@ -68,6 +69,7 @@ public class SoundManager : MonoBehaviour
 
     }
 
+    //AUDIO SNAPSHOTS
     public void SwitchToNormal(float transitionTime = 0.5f) {
         normalSnapshot.TransitionTo(transitionTime);
     }
@@ -79,7 +81,9 @@ public class SoundManager : MonoBehaviour
     public void SwitchToMenu(float transitionTime = 0.5f) {
         menuSnapshot.TransitionTo(transitionTime);
     }
+    //
 
+    //PLAY SOUNDS
     public void PlaySound(sound soundToPlay) {
         switch (soundToPlay) {
             case sound.Block_Hit:

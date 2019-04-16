@@ -65,7 +65,7 @@ public class EnemyBehaviour : MonoBehaviour
     private void FixedUpdate() {
         lastState = currentState;
 
-
+        //FOLLOW PATH OR PLAYER
         if (canStartFollow) {
             if (path.Count > 0) {
                 if (targetPos.x != 0 && targetPos.z != 0 && currentState == states.followPath) {
@@ -81,6 +81,7 @@ public class EnemyBehaviour : MonoBehaviour
             RaycastHit hit;
             Vector3 rayDirection = player.position - transform.position;
            
+            //Check if player is in view
             if (Physics.Raycast(transform.position, rayDirection, out hit,nearDistance, playerMask) && distance > hitDistance) {
                 if (hit.transform.tag == "Player") {
                     seePlayer = true;
@@ -92,20 +93,20 @@ public class EnemyBehaviour : MonoBehaviour
                 }
             }
             
-
+            //Follow player
             if (currentState == states.followPlayer) {
                 transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
                 transform.position += transform.forward * speed * Time.deltaTime;
-
-                
             }
 
+            //Detect state change
             if (lastState != currentState) {
                 if (lastState == states.followPlayer) {
                     StartCoroutine(LostPlayer());
                 }
             }
 
+            //Check distance
             if(distance <= hitDistance) {
                 animator.SetBool("canHit", true);
             }
@@ -115,7 +116,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-
+    //GOTO NEXT NODE
     public void NextNode() {
         if(currentState == states.followPath && canStartFollow) {
             if (path.Count > 0) {
@@ -127,7 +128,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-
+    //ENEMY HAS LOST THE PLAYER
     IEnumerator LostPlayer() {
         animator.SetBool("canHit", false);
         yield return new WaitForSeconds(0.5f);
@@ -137,10 +138,7 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-    bool ValidatePosition(Vector3 pos1, Vector3 pos2, float allowedDistance) {
-        return Vector3.Distance(pos1, pos2) < allowedDistance;
-    }
-
+    //Play growl sound effect
     void Growl() {
         float random = Random.Range(0.0f, 100.0f);
         if (random > 70) {

@@ -27,6 +27,7 @@ public class EnemyLife : MonoBehaviour
 
     void Update()
     {
+        //Check if dead
         if(life <= 0 && !hasBeenKilled) {
             SoundManager.instance.PlaySound(SoundManager.sound.Enemy_Die);
             hasBeenKilled = true;
@@ -45,16 +46,21 @@ public class EnemyLife : MonoBehaviour
         StartCoroutine("HitColor");
     }
 
+    //SHOW HIT COLOR
     IEnumerator HitColor() {
         rd.material.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         rd.material.color = Color.white;
     }
 
+
+    //WAIT X SECONDS TO RESPAWN
     IEnumerator WaitForRespawn() {
         animator.SetBool("canHit", false);
         enemyBehaviour.CanStartFollow = false;
+
         yield return new WaitForSeconds(respawnTime);
+
         enemyBehaviour.CanStartFollow = true;
         hasBeenKilled = false;
         Instantiate(smokeParticles, transform.position, Quaternion.identity);

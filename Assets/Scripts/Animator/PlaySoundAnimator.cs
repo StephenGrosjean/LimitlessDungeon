@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// Play sound on state
+/// </summary>
 public class PlaySoundAnimator : StateMachineBehaviour
 {
    

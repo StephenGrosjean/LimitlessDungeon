@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+/// <summary>
+/// Music player 
+/// </summary>
 public class MusicPlayer : MonoBehaviour
 {
     [SerializeField] private AudioClip menuMusic, gameMusic;
